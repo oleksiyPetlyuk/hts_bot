@@ -1,16 +1,16 @@
 {
   "name": "hts-bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Telegram Bot to store results from heating system",
+  "main": "src/main.js",
   "scripts": {
     "start": "npm run serve",
     "serve": "NODE_ENV=production node src/main.js",
     "watch": "nodemon src/main.js",
     "lint": "eslint src"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Oleksiy Petlyuk",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^8.2.0",
     "mongoose": "^5.11.8",
@@ -19,5 +19,8 @@
   "devDependencies": {
     "eslint": "^7.16.0",
     "nodemon": "^2.0.6"
+  },
+  "engines": {
+    "node": "15.x"
   }
 }
