@@ -1,26 +1,46 @@
 const { Telegraf, Markup, Stage, session } = require('telegraf')
-const strings = require('./strings.json')
+const mongoose = require('mongoose')
 
 require('dotenv').config()
 
-const saveHeatMeeterResultsScene = require('./scenes/saveHeatMeeterResults')
+connect()
 
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
-const stage = new Stage([saveHeatMeeterResultsScene])
+function listen() {
+    const strings = require('./strings.json')
+    const saveHeatMeeterResultsScene = require('./scenes/saveHeatMeeterResults')
 
-bot.use(session())
-bot.use(stage.middleware())
+    const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
+    const stage = new Stage([saveHeatMeeterResultsScene])
 
-bot.start(async ctx => {
-    const options = Markup.inlineKeyboard([
-        Markup.callbackButton(strings.saveHeatMeeterResults, 'saveHeatMeeterResults')
-    ]).extra()
+    bot.use(session())
+    bot.use(stage.middleware())
 
-    await ctx.reply(strings.start, options)
-})
+    bot.start(async ctx => {
+        const options = Markup.inlineKeyboard([
+            Markup.callbackButton(strings.saveHeatMeeterResults, 'saveHeatMeeterResults')
+        ]).extra()
 
-bot.command('save_heat_meeter_results', Stage.enter('saveHeatMeeterResults'))
+        await ctx.reply(strings.start, options)
+    })
 
-bot.action('saveHeatMeeterResults', Stage.enter('saveHeatMeeterResults'))
+    bot.command('save_heat_meeter_results', Stage.enter('saveHeatMeeterResults'))
 
-bot.launch()
+    bot.action('saveHeatMeeterResults', Stage.enter('saveHeatMeeterResults'))
+
+    bot.launch()
+}
+
+function connect() {
+    const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.4lvmf.mongodb.net/${process.env.DB_DATABSE}?retryWrites=true&w=majority`
+
+    mongoose.connection
+        .on('error', console.error.bind(console, 'Error: '))
+        .on('disconnected', connect)
+        .once('open', listen)
+
+    return mongoose.connect(uri, {
+        keepAlive: 1,
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+}

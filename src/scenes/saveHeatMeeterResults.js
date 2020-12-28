@@ -1,5 +1,6 @@
 const WizardScene = require('telegraf/scenes/wizard/index')
 const strings = require('../strings.json')
+const HeatMeeterResult = require('../models/HeatMeeterResult')
 
 const params = {
     accumulatedEnergy: null,
@@ -35,17 +36,25 @@ const step2 = async (ctx) => {
 const step3 = async (ctx) => {
     params.accumulatedVolume = ctx.message.text
 
-    await ctx.reply(strings.saveHeatMeeterResultsQuestions.date)
+    await ctx.replyWithMarkdown(strings.saveHeatMeeterResultsQuestions.date)
 
     return ctx.wizard.next()
 }
 
 const step4 = async (ctx) => {
-    params.date = ctx.message.text
+    const date = new Date(ctx.message.text)
 
-    await ctx.reply(strings.saveHeatMeeterResultsQuestions.errorCode)
+    if (date instanceof Date && !isNaN(date)) {
+        params.date = date
 
-    return ctx.wizard.next()
+        await ctx.reply(strings.saveHeatMeeterResultsQuestions.errorCode)
+
+        return ctx.wizard.next()
+    }
+
+    await ctx.replyWithMarkdown(strings.saveHeatMeeterResultsQuestions.dateError)
+
+    return ctx.wizard.selectStep(ctx.wizard.cursor)
 }
 
 const step5 = async (ctx) => {
@@ -99,16 +108,20 @@ const step10 = async (ctx) => {
 const step11 = async (ctx) => {
     params.workingTime.D = ctx.message.text
 
-    let message = `*${strings.params.accumulatedEnergy}:* ${params.accumulatedEnergy}\n`
-    message += `*${strings.params.accumulatedVolume}:* ${params.accumulatedVolume}\n`
-    message += `*${strings.params.date}:* ${params.date}\n`
-    message += `*${strings.params.errorCode}:* ${params.errorCode}\n`
-    message += `*${strings.params.currentHeatPower}:* ${params.currentHeatPower}\n`
-    message += `*${strings.params.currentHeatStream}:* ${params.currentHeatStream}\n`
-    message += `*${strings.params.inTemperature}:* ${params.inTemperature}\n`
-    message += `*${strings.params.outTemperature}:* ${params.outTemperature}\n`
-    message += `*${strings.params.workingTime.d}:* ${params.workingTime.d}\n`
-    message += `*${strings.params.workingTime.D}:* ${params.workingTime.D}\n`
+    let result = new HeatMeeterResult(params)
+    result = await result.save()
+
+    let message = `*${strings.params.accumulatedEnergy}:* ${result.accumulatedEnergy}\n`
+    message += `*${strings.params.accumulatedVolume}:* ${result.accumulatedVolume}\n`
+    message += `*${strings.params.date}:* ${result.date.toDateString()}\n`
+    message += `*${strings.params.errorCode}:* ${result.errorCode}\n`
+    message += `*${strings.params.currentHeatPower}:* ${result.currentHeatPower}\n`
+    message += `*${strings.params.currentHeatStream}:* ${result.currentHeatStream}\n`
+    message += `*${strings.params.inTemperature}:* ${result.inTemperature}\n`
+    message += `*${strings.params.outTemperature}:* ${result.outTemperature}\n`
+    message += `*${strings.params.workingTime.d}:* ${result.workingTime.d}\n`
+    message += `*${strings.params.workingTime.D}:* ${result.workingTime.D}\n`
+    message += `*createdAt:* ${result.createdAt.toDateString()}\n`
 
     await ctx.replyWithMarkdown(message)
 

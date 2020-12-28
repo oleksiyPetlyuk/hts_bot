@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "mongoose": "^5.11.8",
     "telegraf": "^3.38.0"
   },
   "devDependencies": {
