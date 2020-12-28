@@ -34,6 +34,7 @@ function listen() {
     } else {
         options = {
             webhook: {
+                domain: 'https://my-hts-bot.herokuapp.com',
                 hookPath: `/${process.env.TELEGRAM_TOKEN}`,
                 port: process.env.PORT
             }
