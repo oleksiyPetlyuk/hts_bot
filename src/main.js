@@ -27,7 +27,20 @@ function listen() {
 
     bot.action('saveHeatMeeterResults', Stage.enter('saveHeatMeeterResults'))
 
-    bot.launch()
+    let options = {}
+
+    if (process.env.NODE_ENV !== 'production') {
+        options = {}
+    } else {
+        options = {
+            webhook: {
+                hookPath: `/${process.env.TELEGRAM_TOKEN}`,
+                port: process.env.PORT
+            }
+        }
+    }
+
+    bot.launch(options)
 }
 
 function connect() {
