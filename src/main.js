@@ -27,18 +27,18 @@ function listen() {
 
     bot.action('saveHeatMeeterResults', Stage.enter('saveHeatMeeterResults'))
 
-    let options = {}
+    let options
 
-    if (process.env.NODE_ENV !== 'production') {
-        options = {}
-    } else {
+    if (process.env.NODE_ENV === 'production') {
         options = {
             webhook: {
-                domain: 'https://my-hts-bot.herokuapp.com',
+                domain: process.env.APP_DOMAIN,
                 hookPath: `/${process.env.TELEGRAM_TOKEN}`,
                 port: process.env.PORT
             }
         }
+    } else {
+        options = {}
     }
 
     bot.launch(options)
