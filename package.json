@@ -1,7 +1,7 @@
 {
   "name": "hts-bot",
   "version": "1.0.0",
-  "description": "Telegram Bot to store results from heating system",
+  "description": "Telegram Bot to store results from a heating system",
   "main": "src/main.js",
   "scripts": {
     "start": "npm run serve",
